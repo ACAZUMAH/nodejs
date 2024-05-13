@@ -23,9 +23,19 @@ function createProduct(product){
         resolve(newProduct)
     })
 }
+
+function update(id, productData){
+    return new Promise((resolve, reject) =>{
+        const productIndex = products.findIndex(product => product.id === id)
+        products[productIndex] = {id, ...productData}
+        writeDataToFile('./data/products.json', products)
+        resolve(products[productIndex])
+    })
+}
 module.exports = {
     findProducts,
     findProductById,
-    createProduct
+    createProduct,
+    update
 
 }

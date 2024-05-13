@@ -1,4 +1,7 @@
-const { findProducts, findProductById,createProduct } = require('../models/productsModels')
+const { findProducts, 
+    findProductById,
+    createProduct,
+    update } = require('../models/productsModels')
 const { getPostData } = require('../utils.js')
 // @desc gets all products 
 // @route GET /api/products
@@ -51,16 +54,32 @@ async function addProduct(req, res){
 
 //@desc updating a product 
 //@route GET /api/product/update/:id
-async function updateProduct(req, res,id){
-    try {
-        const body = await getPostData(req)
-    } catch (error) {
-        
+async function updateProduct(req, res, id){
+    try{
+        const productToUpdate = await findProductById(id)
+        if(!productToUpdate){
+            res.writeHeader(404, { 'content-type': 'appliction/json' })
+            res.end(JSON.stringify({ "message": "Product not found" }))
+        }else{
+            const body = await getPostData(req)
+            const { name, discription, price} = JSON.parse(body)
+            const productData = {
+                name: name || productToUpdate.name,
+                discription: discription || productToUpdate.discription,
+                price: price || productToUpdate.price
+            }
+            const updProduct = await update(id, productData)
+            res.writeHeader(200, { "content-type": "application/json" })
+            res.end(JSON.stringify(updProduct))
+        }
+    }catch(error){
+        console.log(error)
     }
 }
 
 module.exports = {
     getProducts,
     getProductById,
-    addProduct
+    addProduct,
+    updateProduct 
 }
